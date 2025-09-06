@@ -115,7 +115,7 @@ export default function InteractiveQuiz({ quizData, topic }: { quizData: QuizDat
                         Sua resposta: {answer.answer}
                         {answer.isCorrect ? <CheckCircle2 className="inline ml-2 h-4 w-4" /> : <XCircle className="inline ml-2 h-4 w-4" />}
                       </p>
-                      {!answer.isCorrect && <p className="text-sm text-blue-600">Resposta correta: {answer.correctAnswer}</p>}
+                      {!answer.isCorrect && <p className="text-sm text-primary">Resposta correta: {answer.correctAnswer}</p>}
                     </div>
                   ))}
                 </div>
