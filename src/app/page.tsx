@@ -1,3 +1,87 @@
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Lightbulb } from "lucide-react";
+
+const FormSchema = z.object({
+  topic: z.string().min(2, {
+    message: "Topic must be at least 2 characters.",
+  }),
+});
+
 export default function Home() {
-  return <></>;
+  const router = useRouter();
+
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      topic: "",
+    },
+  });
+
+  function onSubmit(data: z.infer<typeof FormSchema>) {
+    router.push(`/quiz?topic=${encodeURIComponent(data.topic)}`);
+  }
+
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-grid-purple-500/[0.2] dark:bg-grid-yellow-500/[0.2]">
+      <div className="absolute pointer-events-none inset-0 flex items-center justify-center bg-background [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
+      <Card className="w-full max-w-lg z-10 shadow-2xl">
+        <CardHeader className="text-center">
+          <div className="flex justify-center items-center gap-2 mb-2">
+            <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+                <Lightbulb className="w-8 h-8 text-primary-foreground" />
+            </div>
+          </div>
+          <CardTitle className="text-4xl font-headline font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent to-primary">
+            QuizWhiz AI
+          </CardTitle>
+          <p className="text-muted-foreground">
+            Enter any topic and we'll generate a quiz for you!
+          </p>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="topic"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="sr-only">Topic</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g., The Roman Empire, React.js Hooks, Photosynthesis"
+                        {...field}
+                        className="text-center text-lg h-14"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full text-lg h-12 font-bold" size="lg">
+                Generate Quiz
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </main>
+  );
 }
