@@ -15,35 +15,18 @@ function addVariablesForColors({addBase, theme}: any) {
   });
 }
 
-const bgGrid = plugin(function ({addUtilities}: any) {
-  addUtilities({
-    '.bg-grid': {
-      'background-image': 'url("/grid.svg")',
+const bgGrid = plugin(function ({matchUtilities, theme}: any) {
+  matchUtilities(
+    {
+      'bg-grid': (value: any) => ({
+        backgroundImage: `url("${value}")`,
+      }),
+      'bg-grid-small': (value: any) => ({
+        backgroundImage: `url("${value}")`,
+      }),
     },
-    '.bg-grid-small': {
-      'background-image': 'url("/grid-small.svg")',
-    },
-    '.bg-grid-black': {
-      backgroundImage:
-        'linear-gradient(to right, black 1px, transparent 1px), linear-gradient(to bottom, black 1px, transparent 1px)',
-      backgroundSize: '24px 24px',
-    },
-    '.bg-grid-small-black': {
-      backgroundImage:
-        'linear-gradient(to right, black 1px, transparent 1px), linear-gradient(to bottom, black 1px, transparent 1px)',
-      backgroundSize: '12px 12px',
-    },
-    '.bg-grid-white': {
-      backgroundImage:
-        'linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)',
-      backgroundSize: '24px 24px',
-    },
-    '.bg-grid-small-white': {
-      backgroundImage:
-        'linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)',
-      backgroundSize: '12px 12px',
-    },
-  });
+    {values: theme('backgroundImage')}
+  );
 });
 
 export default {
@@ -59,6 +42,20 @@ export default {
         body: ['PT Sans', 'sans-serif'],
         headline: ['PT Sans', 'sans-serif'],
         code: ['monospace'],
+      },
+      backgroundImage: {
+        'grid-black':
+          'linear-gradient(to right, black 1px, transparent 1px), linear-gradient(to bottom, black 1px, transparent 1px)',
+        'grid-small-black':
+          'linear-gradient(to right, black 1px, transparent 1px), linear-gradient(to bottom, black 1px, transparent 1px)',
+        'grid-white':
+          'linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)',
+        'grid-small-white':
+          'linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)',
+      },
+      backgroundSize: {
+        grid: '24px 24px',
+        'grid-small': '12px 12px',
       },
       colors: {
         background: 'hsl(var(--background))',
