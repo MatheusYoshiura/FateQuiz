@@ -2,43 +2,62 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 
-const ConfettiPiece = ({ id }: { id: number }) => {
+const StarParticle = ({ id, color }: { id: number; color: string }) => {
     const [style, setStyle] = useState<React.CSSProperties>({});
 
     useEffect(() => {
-        const x = Math.random() * 100;
-        const y = Math.random() * -50 - 50; // Start off-screen
-        const rotation = Math.random() * 360;
+        const angle = Math.random() * 360;
+        const distance = 50 + Math.random() * 50;
+        const finalX = Math.cos((angle * Math.PI) / 180) * distance;
+        const finalY = Math.sin((angle * Math.PI) / 180) * distance;
+        const duration = 0.5 + Math.random() * 0.5;
         const delay = Math.random() * 0.2;
-        const duration = 0.8 + Math.random() * 0.5;
-        // Updated colors to match the system's theme
-        const colors = ['hsl(var(--primary))', 'hsl(var(--accent))', '#29cdff', '#78ff44', '#fdff6a'];
-        const color = colors[Math.floor(Math.random() * colors.length)];
 
-        setStyle({
-            left: `${x}vw`,
-            top: `${y}vh`,
-            transform: `rotate(${rotation}deg)`,
+        const initialStyle: React.CSSProperties = {
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            width: '8px',
+            height: '8px',
             backgroundColor: color,
-            animation: `fall ${duration}s ${delay}s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards`,
+            clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)',
+            transform: 'translate(-50%, -50%) scale(0)',
             opacity: 1,
-            position: 'fixed',
-            width: '10px',
-            height: '20px',
-            zIndex: 100,
-        });
-    }, [id]);
+        };
+
+        const finalStyle: React.CSSProperties = {
+            ...initialStyle,
+            transform: `translate(calc(-50% + ${finalX}px), calc(-50% + ${finalY}px)) scale(1)`,
+            opacity: 0,
+            transition: `transform ${duration}s ${delay}s cubic-bezier(0.1, 0.75, 0.25, 1), opacity ${duration}s ${delay}s`,
+        };
+        
+        setStyle(initialStyle);
+        
+        const timeoutId = setTimeout(() => {
+            setStyle(finalStyle);
+        }, 50);
+
+        return () => clearTimeout(timeoutId);
+
+    }, [id, color]);
 
     return <div style={style} />;
 };
 
-export const Confetti = React.memo(({ count = 150 }: { count?: number }) => {
-    const pieces = useMemo(() => Array.from({ length: count }, (_, i) => i), [count]);
+export const StarBurst = React.memo(({ count = 20 }: { count?: number }) => {
+    const colors = ['hsl(var(--primary))', 'hsl(var(--accent))', '#FFD700'];
+    const particles = useMemo(() => 
+        Array.from({ length: count }, (_, i) => ({
+            id: i,
+            color: colors[i % colors.length]
+        })), [count]);
+
     return (
-        <div className="pointer-events-none fixed inset-0 z-[100] overflow-hidden">
-            {pieces.map(i => <ConfettiPiece key={i} id={i} />)}
+        <div className="pointer-events-none absolute inset-0 z-10">
+            {particles.map(p => <StarParticle key={p.id} id={p.id} color={p.color} />)}
         </div>
     );
 });
 
-Confetti.displayName = "Confetti";
+StarBurst.displayName = "StarBurst";

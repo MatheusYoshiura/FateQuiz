@@ -23,7 +23,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { CheckCircle2, XCircle, Award, BookOpen, Repeat, Home } from "lucide-react";
-import { Confetti } from "./confetti";
+import { StarBurst } from "./confetti";
 
 type QuizState = "ongoing" | "answered" | "completed";
 type UserAnswer = { question: string; answer: string; isCorrect: boolean; correctAnswer: string; };
@@ -63,7 +63,7 @@ export default function InteractiveQuiz({ quizData, topic }: { quizData: QuizDat
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [summary, setSummary] = useState<string>("");
   const [isSummaryLoading, setIsSummaryLoading] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
+  const [showBurst, setShowBurst] = useState(false);
 
   const currentQuestion: QuizQuestion = quizData.quiz[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / quizData.quiz.length) * 100;
@@ -86,12 +86,12 @@ export default function InteractiveQuiz({ quizData, topic }: { quizData: QuizDat
       setQuizState("answered");
 
       if (isCorrect) {
-        setShowConfetti(true);
+        setShowBurst(true);
         playCorrectSound();
       }
 
       setTimeout(() => {
-        setShowConfetti(false);
+        setShowBurst(false);
         if (currentQuestionIndex < quizData.quiz.length - 1) {
           setCurrentQuestionIndex(currentQuestionIndex + 1);
           setQuizState("ongoing");
@@ -169,7 +169,6 @@ export default function InteractiveQuiz({ quizData, topic }: { quizData: QuizDat
 
   return (
     <>
-      {showConfetti && <Confetti />}
       <Card className="w-full max-w-3xl">
         <CardHeader>
           <Progress value={progress} className="mb-2" />
@@ -184,7 +183,7 @@ export default function InteractiveQuiz({ quizData, topic }: { quizData: QuizDat
             let buttonClass = 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
             if (quizState === "answered") {
               if (isCorrectAnswer) {
-                  buttonClass = 'bg-green-500 text-white animate-in zoom-in-105';
+                  buttonClass = 'bg-green-500 text-white animate-in zoom-in-105 shadow-lg shadow-green-500/50';
               } else if (isSelected) {
                   buttonClass = 'bg-red-500 text-white';
               } else {
@@ -197,10 +196,11 @@ export default function InteractiveQuiz({ quizData, topic }: { quizData: QuizDat
                 key={index}
                 onClick={() => handleOptionSelect(option)}
                 disabled={quizState === "answered"}
-                className={cn("h-auto min-h-[4rem] whitespace-normal justify-start p-4 text-left transition-all duration-300", buttonClass)}
+                className={cn("relative h-auto min-h-[4rem] whitespace-normal justify-start p-4 text-left transition-all duration-300", buttonClass)}
               >
                 <Badge variant="outline" className="mr-4 text-lg bg-background">{String.fromCharCode(65 + index)}</Badge>
                 {option}
+                {quizState === "answered" && isCorrectAnswer && showBurst && <StarBurst />}
               </Button>
             );
           })}
