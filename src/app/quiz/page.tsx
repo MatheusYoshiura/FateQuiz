@@ -20,14 +20,14 @@ export default async function QuizPage({
   try {
     quizData = await generateQuizFromTopic({ topic: topic, numQuestions: 10 });
   } catch (error) {
-    console.error("Failed to generate quiz:", error);
+    console.error("Falha ao gerar o quiz:", error);
     return (
         <div className="flex min-h-screen items-center justify-center p-4">
             <Alert variant="destructive" className="max-w-lg">
                 <Terminal className="h-4 w-4" />
-                <AlertTitle>Error Generating Quiz</AlertTitle>
+                <AlertTitle>Erro ao Gerar o Quiz</AlertTitle>
                 <AlertDescription>
-                    We couldn't generate a quiz for the topic "{topic}". Please try another topic or check back later.
+                    Não conseguimos gerar um quiz para o tópico "{topic}". Por favor, tente outro tópico ou volte mais tarde.
                 </AlertDescription>
             </Alert>
         </div>
@@ -39,9 +39,9 @@ export default async function QuizPage({
         <div className="flex min-h-screen items-center justify-center p-4">
             <Alert variant="destructive" className="max-w-lg">
                 <Terminal className="h-4 w-4" />
-                <AlertTitle>No Questions Found</AlertTitle>
+                <AlertTitle>Nenhuma Pergunta Encontrada</AlertTitle>
                 <AlertDescription>
-                    The AI couldn't create any questions for "{topic}". This can happen with very niche or abstract topics. Please try a different one.
+                    A IA não conseguiu criar nenhuma pergunta para "{topic}". Isso pode acontecer com tópicos muito específicos ou abstratos. Por favor, tente um diferente.
                 </AlertDescription>
             </Alert>
         </div>
@@ -50,7 +50,7 @@ export default async function QuizPage({
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 md:p-6">
-      <Suspense fallback={<div>Loading quiz...</div>}>
+      <Suspense fallback={<div>Carregando quiz...</div>}>
         <InteractiveQuiz quizData={quizData} topic={topic} />
       </Suspense>
     </main>

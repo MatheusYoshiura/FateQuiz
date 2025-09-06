@@ -41,15 +41,15 @@ const prompt = ai.definePrompt({
   name: 'generateQuizFromTopicPrompt',
   input: {schema: GenerateQuizFromTopicInputSchema},
   output: {schema: GenerateQuizFromTopicOutputSchema},
-  prompt: `You are an expert quiz generator. Generate a quiz with the following properties:
+  prompt: `Você é um especialista em gerar quizzes. Gere um quiz em português do Brasil com as seguintes propriedades:
 
-Topic: {{{topic}}}
-Number of Questions: {{{numQuestions}}}
+Tópico: {{{topic}}}
+Número de Questões: {{{numQuestions}}}
 
-Each question should have 4 possible answers.
-Ensure that one of the options is the correct answer.
+Cada questão deve ter 4 respostas possíveis.
+Garanta que uma das opções seja a resposta correta.
 
-Output a JSON object that is an array of questions, with each question having the properties "question", "options", and "answer".
+Gere um objeto JSON que seja um array de questões, onde cada questão tem as propriedades "question", "options", e "answer".
 `,
 });
 

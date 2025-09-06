@@ -20,7 +20,7 @@ import { Lightbulb } from "lucide-react";
 
 const FormSchema = z.object({
   topic: z.string().min(2, {
-    message: "Topic must be at least 2 characters.",
+    message: "O tópico deve ter pelo menos 2 caracteres.",
   }),
 });
 
@@ -49,10 +49,10 @@ export default function Home() {
             </div>
           </div>
           <CardTitle className="text-4xl font-headline font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent to-primary">
-            QuizWhiz AI
+            Quiz IA Gênio
           </CardTitle>
           <p className="text-muted-foreground">
-            Enter any topic and we'll generate a quiz for you!
+            Digite qualquer tópico e nós geraremos um quiz para você!
           </p>
         </CardHeader>
         <CardContent>
@@ -63,10 +63,10 @@ export default function Home() {
                 name="topic"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="sr-only">Topic</FormLabel>
+                    <FormLabel className="sr-only">Tópico</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="e.g., The Roman Empire, React.js Hooks, Photosynthesis"
+                        placeholder="ex: O Império Romano, Hooks do React.js, Fotossíntese"
                         {...field}
                         className="text-center text-lg h-14"
                       />
@@ -76,7 +76,7 @@ export default function Home() {
                 )}
               />
               <Button type="submit" className="w-full text-lg h-12 font-bold" size="lg">
-                Generate Quiz
+                Gerar Quiz
               </Button>
             </form>
           </Form>

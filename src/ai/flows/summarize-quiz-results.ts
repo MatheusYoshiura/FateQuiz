@@ -34,15 +34,17 @@ const prompt = ai.definePrompt({
   name: 'summarizeQuizResultsPrompt',
   input: {schema: SummarizeQuizResultsInputSchema},
   output: {schema: SummarizeQuizResultsOutputSchema},
-  prompt: `You are an AI quiz summarizer. Given the following quiz results, provide a concise summary of the user's performance on the quiz.
+  prompt: `Você é um sumarizador de quizzes de IA. Com base nos resultados do quiz a seguir, forneça um resumo conciso em português do Brasil do desempenho do usuário.
 
-Topic: {{{topic}}}
-Score: {{{score}}}
-Total Questions: {{{totalQuestions}}}
-Correct Answers: {{{correctAnswers}}}
-Incorrect Answers: {{{incorrectAnswers}}}
+Tópico: {{{topic}}}
+Pontuação: {{{score}}}
+Total de Questões: {{{totalQuestions}}}
+Respostas Corretas: {{{correctAnswers}}}
+Respostas Incorretas: {{{incorrectAnswers}}}
 
-Summary:`,
+O resumo deve ser encorajador e amigável.
+
+Resumo:`,
 });
 
 const summarizeQuizResultsFlow = ai.defineFlow(

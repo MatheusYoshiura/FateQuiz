@@ -7,7 +7,7 @@ export async function getQuizSummary(input: SummarizeQuizResultsInput): Promise<
         const result = await summarizeQuizResults(input);
         return result;
     } catch(error) {
-        console.error("Error in getQuizSummary server action:", error);
-        return { summary: "Sorry, we couldn't generate a summary for your results at this time." };
+        console.error("Erro na ação do servidor getQuizSummary:", error);
+        return { summary: "Desculpe, não conseguimos gerar um resumo para seus resultados no momento." };
     }
 }
