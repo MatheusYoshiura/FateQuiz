@@ -23,6 +23,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { CheckCircle2, XCircle, Award, BookOpen, Repeat, Home } from "lucide-react";
+import { Confetti } from "./confetti";
 
 type QuizState = "ongoing" | "answered" | "completed";
 type UserAnswer = { question: string; answer: string; isCorrect: boolean; correctAnswer: string; };
@@ -35,6 +36,7 @@ export default function InteractiveQuiz({ quizData, topic }: { quizData: QuizDat
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [summary, setSummary] = useState<string>("");
   const [isSummaryLoading, setIsSummaryLoading] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const currentQuestion: QuizQuestion = quizData.quiz[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / quizData.quiz.length) * 100;
@@ -56,7 +58,12 @@ export default function InteractiveQuiz({ quizData, topic }: { quizData: QuizDat
       ]);
       setQuizState("answered");
 
+      if (isCorrect) {
+        setShowConfetti(true);
+      }
+
       setTimeout(() => {
+        setShowConfetti(false);
         if (currentQuestionIndex < quizData.quiz.length - 1) {
           setCurrentQuestionIndex(currentQuestionIndex + 1);
           setQuizState("ongoing");
@@ -133,41 +140,44 @@ export default function InteractiveQuiz({ quizData, topic }: { quizData: QuizDat
   }
 
   return (
-    <Card className="w-full max-w-3xl">
-      <CardHeader>
-        <Progress value={progress} className="mb-2" />
-        <CardDescription>Pergunta {currentQuestionIndex + 1} de {quizData.quiz.length}</CardDescription>
-        <CardTitle className="text-2xl font-headline">{currentQuestion.question}</CardTitle>
-      </CardHeader>
-      <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {currentQuestion.options.map((option, index) => {
-          const isCorrectAnswer = option === currentQuestion.answer;
-          const isSelected = option === selectedOption;
-          
-          let buttonClass = 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
-          if (quizState === "answered") {
-            if (isCorrectAnswer) {
-                buttonClass = 'bg-green-500 text-white animate-in zoom-in-105';
-            } else if (isSelected) {
-                buttonClass = 'bg-red-500 text-white';
-            } else {
-                buttonClass = 'bg-secondary text-muted-foreground opacity-50';
+    <>
+      {showConfetti && <Confetti />}
+      <Card className="w-full max-w-3xl">
+        <CardHeader>
+          <Progress value={progress} className="mb-2" />
+          <CardDescription>Pergunta {currentQuestionIndex + 1} de {quizData.quiz.length}</CardDescription>
+          <CardTitle className="text-2xl font-headline">{currentQuestion.question}</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {currentQuestion.options.map((option, index) => {
+            const isCorrectAnswer = option === currentQuestion.answer;
+            const isSelected = option === selectedOption;
+            
+            let buttonClass = 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
+            if (quizState === "answered") {
+              if (isCorrectAnswer) {
+                  buttonClass = 'bg-green-500 text-white animate-in zoom-in-105';
+              } else if (isSelected) {
+                  buttonClass = 'bg-red-500 text-white';
+              } else {
+                  buttonClass = 'bg-secondary text-muted-foreground opacity-50';
+              }
             }
-          }
 
-          return (
-            <Button
-              key={index}
-              onClick={() => handleOptionSelect(option)}
-              disabled={quizState === "answered"}
-              className={cn("h-auto min-h-[4rem] whitespace-normal justify-start p-4 text-left transition-all duration-300", buttonClass)}
-            >
-              <Badge variant="outline" className="mr-4 text-lg bg-background">{String.fromCharCode(65 + index)}</Badge>
-              {option}
-            </Button>
-          );
-        })}
-      </CardContent>
-    </Card>
+            return (
+              <Button
+                key={index}
+                onClick={() => handleOptionSelect(option)}
+                disabled={quizState === "answered"}
+                className={cn("h-auto min-h-[4rem] whitespace-normal justify-start p-4 text-left transition-all duration-300", buttonClass)}
+              >
+                <Badge variant="outline" className="mr-4 text-lg bg-background">{String.fromCharCode(65 + index)}</Badge>
+                {option}
+              </Button>
+            );
+          })}
+        </CardContent>
+      </Card>
+    </>
   );
 }
