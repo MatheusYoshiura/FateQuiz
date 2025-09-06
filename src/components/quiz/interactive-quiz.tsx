@@ -28,6 +28,33 @@ import { Confetti } from "./confetti";
 type QuizState = "ongoing" | "answered" | "completed";
 type UserAnswer = { question: string; answer: string; isCorrect: boolean; correctAnswer: string; };
 
+function playCorrectSound() {
+  try {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    if (!audioContext) return;
+
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.02);
+
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+    oscillator.frequency.exponentialRampToValueAtTime(1046.50, audioContext.currentTime + 0.1); // C6
+
+    gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.2);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.25);
+  } catch (error) {
+    console.error("Não foi possível reproduzir o som:", error);
+  }
+}
+
 export default function InteractiveQuiz({ quizData, topic }: { quizData: QuizData; topic: string; }) {
   const router = useRouter();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -60,6 +87,7 @@ export default function InteractiveQuiz({ quizData, topic }: { quizData: QuizDat
 
       if (isCorrect) {
         setShowConfetti(true);
+        playCorrectSound();
       }
 
       setTimeout(() => {
