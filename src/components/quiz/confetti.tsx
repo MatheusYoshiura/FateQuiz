@@ -11,7 +11,8 @@ const ConfettiPiece = ({ id }: { id: number }) => {
         const rotation = Math.random() * 360;
         const delay = Math.random() * 0.2;
         const duration = 0.8 + Math.random() * 0.5;
-        const colors = ['#a864fd', '#29cdff', '#78ff44', '#ff718d', '#fdff6a'];
+        // Updated colors to match the system's theme
+        const colors = ['hsl(var(--primary))', 'hsl(var(--accent))', '#29cdff', '#78ff44', '#fdff6a'];
         const color = colors[Math.floor(Math.random() * colors.length)];
 
         setStyle({
