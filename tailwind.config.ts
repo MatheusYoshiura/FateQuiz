@@ -1,4 +1,50 @@
 import type {Config} from 'tailwindcss';
+const {
+  default: flattenColorPalette,
+} = require('tailwindcss/lib/util/flattenColorPalette');
+const plugin = require('tailwindcss/plugin');
+
+function addVariablesForColors({addBase, theme}: any) {
+  let allColors = flattenColorPalette(theme('colors'));
+  let newVars = Object.fromEntries(
+    Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
+  );
+
+  addBase({
+    ':root': newVars,
+  });
+}
+
+const bgGrid = plugin(function ({addUtilities}: any) {
+  addUtilities({
+    '.bg-grid': {
+      'background-image': 'url("/grid.svg")',
+    },
+    '.bg-grid-small': {
+      'background-image': 'url("/grid-small.svg")',
+    },
+    '.bg-grid-black': {
+      backgroundImage:
+        'linear-gradient(to right, black 1px, transparent 1px), linear-gradient(to bottom, black 1px, transparent 1px)',
+      backgroundSize: '24px 24px',
+    },
+    '.bg-grid-small-black': {
+      backgroundImage:
+        'linear-gradient(to right, black 1px, transparent 1px), linear-gradient(to bottom, black 1px, transparent 1px)',
+      backgroundSize: '12px 12px',
+    },
+    '.bg-grid-white': {
+      backgroundImage:
+        'linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)',
+      backgroundSize: '24px 24px',
+    },
+    '.bg-grid-small-white': {
+      backgroundImage:
+        'linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)',
+      backgroundSize: '12px 12px',
+    },
+  });
+});
 
 export default {
   darkMode: ['class'],
@@ -95,5 +141,5 @@ export default {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require('tailwindcss-animate'), addVariablesForColors, bgGrid],
 } satisfies Config;
