@@ -1,4 +1,4 @@
-# **App Name**: QuizWhiz AI
+# **App Name**: FateQuiz IA Quiz Generator
 
 ## Core Features:
 
