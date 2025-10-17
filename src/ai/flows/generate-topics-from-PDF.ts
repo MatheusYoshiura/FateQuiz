@@ -18,20 +18,19 @@ export type GenerateTopicsFromPDFOutput = z.infer<typeof GenerateTopicsFromPDFOu
 export async function generateTopicsFromPDF(
     input: GenerateTopicsFromPDFInput
 ): Promise<GenerateTopicsFromPDFOutput> {
-    // ✅ Lê o arquivo PDF
     const dataBuffer = fs.readFileSync(input.filePath);
-
-    // ✅ Converte para Uint8Array
     const uint8Array = new Uint8Array(dataBuffer);
 
-    // ✅ Carrega o PDF no ambiente Node.js
     const pdf = await pdfjsLib.getDocument({ data: uint8Array }).promise;
+
+    console.log("Número de páginas do PDF:", pdf.numPages);
 
     let fullText = '';
     for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const content = await page.getTextContent();
         const pageText = content.items.map((item: any) => item.str).join(' ');
+        console.log(`Página ${i} trecho:`, pageText.slice(0, 100));
         fullText += `\n--- Página ${i} ---\n${pageText}`;
     }
 
@@ -43,14 +42,19 @@ export async function generateTopicsFromPDF(
         input: { schema: z.object({ text: z.string() }) },
         output: { schema: z.object({ topics: z.array(z.string()) }) },
         prompt: `
-      Leia o texto a seguir e identifique os principais temas ou assuntos tratados.
-      Responda apenas com uma lista JSON de temas em português.
+          Leia o texto a seguir e identifique os principais temas ou assuntos tratados.
+          Responda apenas com uma lista JSON de temas em português.
 
-      Texto:
-      "{{{text}}}"
-    `,
+          Texto:
+          "{{{text}}}"
+        `,
     });
 
     const { output } = await prompt({ text: textSample });
-    return { topics: output?.topics ?? [] };
+
+    console.log("Resposta da IA:", output);
+
+    // ✅ Garante que sempre retorne array
+    const topics = Array.isArray(output?.topics) ? output.topics : [];
+    return { topics };
 }

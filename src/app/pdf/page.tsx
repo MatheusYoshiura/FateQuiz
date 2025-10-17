@@ -48,6 +48,7 @@ export default function PDFUploadPage() {
                 throw new Error("A resposta do servidor não está em formato JSON válido.");
             }
 
+            console.log("Array que será definido em state:", data.topics);
             setTopics(data.topics || []);
         } catch (err: any) {
             console.error("Erro:", err);
@@ -98,15 +99,17 @@ export default function PDFUploadPage() {
 
                     {error && <p className="text-red-500 text-sm">{error}</p>}
 
-                    {topics.length > 0 && (
-                        <div className="bg-muted rounded-lg p-4 text-sm">
+                    {topics.length > 0 ? (
+                        <>
                             <h3 className="font-bold mb-2">Tópicos encontrados:</h3>
                             <ul className="list-disc pl-5">
                                 {topics.map((t, i) => (
                                     <li key={i}>{t}</li>
                                 ))}
                             </ul>
-                        </div>
+                        </>
+                    ) : (
+                        <p className="text-muted-foreground">Nenhum tópico extraído ainda.</p>
                     )}
                 </CardContent>
             </Card>

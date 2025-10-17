@@ -1,28 +1,20 @@
 import fs from "fs";
 import path from "path";
 import { pathToFileURL } from "url";
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
 
-// ✅ Corrige "DOMMatrix is not defined" no ambiente Node
+// ✅ Corrige "DOMMatrix is not defined"
 if (typeof (global as any).DOMMatrix === "undefined") {
     (global as any).DOMMatrix = class DOMMatrix {};
 }
 
-// ✅ Importa pdfjs-dist compatível com Node
-import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
-
-// ✅ Caminho absoluto até o worker no diretório public
+// ⚠️ No Node, o worker não é necessário. Mas vamos definir o worker apenas se existir
 const workerPath = path.join(process.cwd(), "public", "pdf.worker.min.mjs");
-
-// ⚠️ Verifica se o arquivo realmente existe
-if (!fs.existsSync(workerPath)) {
-    throw new Error(`❌ Worker não encontrado em: ${workerPath}`);
+if (fs.existsSync(workerPath)) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = pathToFileURL(workerPath).toString();
+    console.log("✅ pdfjs worker definido em:", pdfjsLib.GlobalWorkerOptions.workerSrc);
+} else {
+    console.warn("⚠️ pdfjs worker não encontrado. Continuando sem worker.");
 }
 
-// ✅ Converte para URL válida (necessário no Windows)
-pdfjsLib.GlobalWorkerOptions.workerSrc = pathToFileURL(workerPath).toString();
-
-// (opcional) debug
-console.log("✅ pdfjs worker definido em:", pdfjsLib.GlobalWorkerOptions.workerSrc);
-
-// ✅ Exporta a instância configurada
 export { pdfjsLib };
