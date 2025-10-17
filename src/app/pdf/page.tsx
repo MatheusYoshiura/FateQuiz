@@ -1,52 +1,57 @@
 "use client";
 
 import React, { useState } from "react";
-import * as pdfjsLib from "pdfjs-dist";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Loader2, FileText } from "lucide-react";
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
-
-export default function PDFReaderPage() {
+export default function PDFUploadPage() {
     const [file, setFile] = useState<File | null>(null);
-    const [text, setText] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const [topics, setTopics] = useState<string[]>([]);
     const [error, setError] = useState<string | null>(null);
 
-    function handleFileSelect(event: React.ChangeEvent<HTMLInputElement>) {
-        setFile(event.target.files?.[0] || null);
-        setText(null);
-        setError(null);
-    }
-
-    async function handleReadPDF() {
+    async function handleUpload() {
         if (!file) {
-            setError("Por favor, selecione um arquivo PDF primeiro.");
+            setError("Selecione um arquivo PDF antes de enviar.");
             return;
         }
 
         setLoading(true);
         setError(null);
-        setText(null);
+        setTopics([]);
 
         try {
-            const arrayBuffer = await file.arrayBuffer();
-            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            const formData = new FormData();
+            formData.append("file", file);
 
-            let fullText = "";
-            for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const textContent = await page.getTextContent();
-                const pageText = textContent.items.map((item: any) => item.str).join(" ");
-                fullText += `\n--- Página ${i} ---\n` + pageText;
+            const res = await fetch("/api/pdf/topics", {
+                method: "POST",
+                body: formData,
+            });
+
+            // 🧩 Verifica se o servidor retornou erro (status não 2xx)
+            if (!res.ok) {
+                const text = await res.text(); // pode ser HTML ou JSON
+                console.error("Resposta de erro do servidor:", text);
+                throw new Error(`Erro ${res.status}: falha ao processar o PDF.`);
             }
 
-            setText(fullText);
-        } catch (err) {
-            console.error("Erro ao ler PDF:", err);
-            setError("Falha ao ler o arquivo PDF. Verifique o formato e tente novamente.");
+            // 🧩 Tenta converter para JSON com segurança
+            let data: any;
+            try {
+                data = await res.json();
+            } catch {
+                const text = await res.text();
+                console.error("Erro ao interpretar resposta JSON:", text);
+                throw new Error("A resposta do servidor não está em formato JSON válido.");
+            }
+
+            setTopics(data.topics || []);
+        } catch (err: any) {
+            console.error("Erro:", err);
+            setError(err.message || "Falha ao processar o PDF.");
         } finally {
             setLoading(false);
         }
@@ -54,9 +59,6 @@ export default function PDFReaderPage() {
 
     return (
         <main className="relative flex min-h-screen flex-col items-center justify-center p-4">
-            <div className="absolute pointer-events-none inset-0 bg-background [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
-            <div className="absolute top-0 left-0 w-full h-full bg-grid-small-black/[0.2] dark:bg-grid-small-white/[0.2] pointer-events-none"></div>
-
             <Card className="w-full max-w-3xl z-10 shadow-2xl">
                 <CardHeader className="text-center">
                     <div className="flex justify-center items-center gap-2 mb-2">
@@ -65,32 +67,45 @@ export default function PDFReaderPage() {
                         </div>
                     </div>
                     <CardTitle className="text-3xl font-headline font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent to-primary">
-                        Leitor de PDF - FateQuiz
+                        Extrair Tópicos do PDF - FateQuiz
                     </CardTitle>
                     <p className="text-muted-foreground">
-                        Faça upload de um arquivo PDF e clique em "Ler PDF".
+                        Faça upload de um arquivo PDF e veja os tópicos extraídos pela IA.
                     </p>
                 </CardHeader>
 
                 <CardContent className="space-y-6">
                     <div className="flex items-center gap-2">
-                        <Input type="file" accept="application/pdf" onChange={handleFileSelect} />
-                        <Button onClick={handleReadPDF} disabled={loading}>
+                        <Input
+                            type="file"
+                            accept="application/pdf"
+                            onChange={(e) => {
+                                setFile(e.target.files?.[0] || null);
+                                setTopics([]);
+                                setError(null);
+                            }}
+                        />
+                        <Button onClick={handleUpload} disabled={loading}>
                             {loading ? (
                                 <>
-                                    <Loader2 className="animate-spin w-4 h-4 mr-2" /> Lendo PDF...
+                                    <Loader2 className="animate-spin w-4 h-4 mr-2" /> Processando...
                                 </>
                             ) : (
-                                "Ler PDF"
+                                "Extrair Tópicos"
                             )}
                         </Button>
                     </div>
 
                     {error && <p className="text-red-500 text-sm">{error}</p>}
 
-                    {text && (
-                        <div className="bg-muted rounded-lg p-4 max-h-[400px] overflow-y-auto text-sm whitespace-pre-wrap">
-                            {text}
+                    {topics.length > 0 && (
+                        <div className="bg-muted rounded-lg p-4 text-sm">
+                            <h3 className="font-bold mb-2">Tópicos encontrados:</h3>
+                            <ul className="list-disc pl-5">
+                                {topics.map((t, i) => (
+                                    <li key={i}>{t}</li>
+                                ))}
+                            </ul>
                         </div>
                     )}
                 </CardContent>
