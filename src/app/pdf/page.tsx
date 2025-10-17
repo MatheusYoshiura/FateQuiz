@@ -31,25 +31,19 @@ export default function PDFUploadPage() {
                 body: formData,
             });
 
-            // 🧩 Verifica se o servidor retornou erro (status não 2xx)
             if (!res.ok) {
-                const text = await res.text(); // pode ser HTML ou JSON
+                const text = await res.text();
                 console.error("Resposta de erro do servidor:", text);
                 throw new Error(`Erro ${res.status}: falha ao processar o PDF.`);
             }
 
-            // 🧩 Tenta converter para JSON com segurança
-            let data: any;
-            try {
-                data = await res.json();
-            } catch {
-                const text = await res.text();
-                console.error("Erro ao interpretar resposta JSON:", text);
-                throw new Error("A resposta do servidor não está em formato JSON válido.");
-            }
-
+            const data = await res.json();
+            console.log("Resposta completa do backend:", data);
             console.log("Array que será definido em state:", data.topics);
-            setTopics(data.topics || []);
+
+            // ✅ Garante que topics seja sempre array
+            // setTopics(Array.isArray(data.topics) ? data.topics : []);
+            setTopics(Array.isArray(data.topics?.topics) ? data.topics.topics : []);
         } catch (err: any) {
             console.error("Erro:", err);
             setError(err.message || "Falha ao processar o PDF.");
@@ -99,18 +93,20 @@ export default function PDFUploadPage() {
 
                     {error && <p className="text-red-500 text-sm">{error}</p>}
 
-                    {topics.length > 0 ? (
-                        <>
-                            <h3 className="font-bold mb-2">Tópicos encontrados:</h3>
-                            <ul className="list-disc pl-5">
-                                {topics.map((t, i) => (
-                                    <li key={i}>{t}</li>
-                                ))}
-                            </ul>
-                        </>
-                    ) : (
-                        <p className="text-muted-foreground">Nenhum tópico extraído ainda.</p>
-                    )}
+                    <div className="bg-gray-100 rounded-lg p-4 text-black text-sm">
+                        {topics.length > 0 ? (
+                            <>
+                                <h3 className="font-bold mb-2">Tópicos encontrados:</h3>
+                                <ul className="list-disc pl-5">
+                                    {topics.map((t, i) => (
+                                        <li key={i}>{t}</li>
+                                    ))}
+                                </ul>
+                            </>
+                        ) : (
+                            <p className="text-gray-500">Nenhum tópico extraído ainda.</p>
+                        )}
+                    </div>
                 </CardContent>
             </Card>
         </main>
