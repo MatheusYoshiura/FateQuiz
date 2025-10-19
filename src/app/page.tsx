@@ -39,9 +39,12 @@ export default function Home() {
 
   return (
       <main className="relative flex min-h-screen flex-col items-center justify-center p-4">
+        {/* Fundo */}
         <div className="absolute pointer-events-none inset-0 flex items-center justify-center bg-background [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
         <div className="absolute top-0 left-0 w-full h-full bg-grid-black/[0.2] dark:bg-grid-white/[0.2] pointer-events-none"></div>
-        <Card className="w-full max-w-lg z-10 shadow-2xl">
+
+        {/* Card principal ampliado */}
+        <Card className="w-full max-w-3xl z-10 shadow-2xl">
           <CardHeader className="text-center">
             <div className="flex justify-center items-center gap-2 mb-2">
               <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
@@ -52,49 +55,85 @@ export default function Home() {
               FateQuiz IA Generator
             </CardTitle>
             <p className="text-muted-foreground">
-              Digite um tópico ou faça upload de um arquivo PDF e nós geraremos um quiz para você!
+              Crie questionários personalizados com o poder da inteligência artificial.
             </p>
           </CardHeader>
 
           <CardContent>
+              <CardTitle className="mb-20">
+              </CardTitle>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                {/* Campo de tópico + botão Gerar Quiz */}
                 <FormField
                     control={form.control}
                     name="topic"
                     render={({ field }) => (
                         <FormItem>
+                          <p className="text-muted-foreground mb-2">
+                            Crie seu quiz a partir de um tópico
+                          </p>
                           <FormLabel className="sr-only">Tópico</FormLabel>
-                          <FormControl>
-                            <Input
-                                placeholder="ex: O Império Romano, Hooks do React.js, Fotossíntese"
-                                {...field}
-                                className="text-center text-lg h-14"
-                            />
-                          </FormControl>
+                          <div className="flex flex-col sm:flex-row gap-4">
+                            <FormControl className="flex-1">
+                              <Input
+                                  placeholder="ex: O Império Romano, Hooks do React.js, Fotossíntese"
+                                  {...field}
+                                  className="text-center text-lg h-14"
+                              />
+                            </FormControl>
+                            <Button
+                                type="submit"
+                                className="text-lg h-14 font-bold sm:w-48"
+                                size="lg"
+                            >
+                              Gerar Quiz
+                            </Button>
+                          </div>
                           <FormMessage />
                         </FormItem>
                     )}
                 />
 
-                {/* Botão normal para gerar quiz */}
-                <Button
-                    type="submit"
-                    className="w-full text-lg h-12 font-bold"
-                    size="lg"
-                >
-                  Gerar Quiz
-                </Button>
+                {/* 🔹 Linha pontilhada com "OU" no centro */}
+                <div className="relative my-8 flex items-center justify-center">
+                  <div className="w-full border-t border-dashed border-muted-foreground"></div>
+                  <span className="absolute bg-background px-4 text-muted-foreground font-medium">
+                  ou
+                </span>
+                </div>
 
-                {/* Novo botão para ir para a página de upload PDF */}
-                <Button
-                    type="button"
-                    onClick={() => router.push("/pdf")}
-                    variant="outline"
-                    className="w-full text-lg h-12 font-bold"
-                >
-                  Upload PDF
-                </Button>
+                  {/* Campo de tópico + botão Gerar Quiz */}
+                  <FormField
+                      control={form.control}
+                      name="topic"
+                      render={({ field }) => (
+                          <FormItem>
+                              <p className="text-muted-foreground mb-2">
+                                  Crie seu quiz a partir de um arquivo
+                              </p>
+                              <FormLabel className="sr-only">Tópico</FormLabel>
+                              <div className="flex flex-col sm:flex-row gap-4">
+                                  <FormControl className="flex-1">
+                                      <Input
+                                          placeholder="ex:"
+                                          {...field}
+                                          className="text-center text-lg h-14"
+                                      />
+                                  </FormControl>
+                                  <Button
+                                      type="submit"
+                                      className="text-lg h-14 font-bold sm:w-48"
+                                      size="lg"
+                                      onClick={() => router.push("/pdf")}
+                                  >
+                                      Upload PDF
+                                  </Button>
+                              </div>
+                              <FormMessage />
+                          </FormItem>
+                      )}
+                  />
               </form>
             </Form>
           </CardContent>
