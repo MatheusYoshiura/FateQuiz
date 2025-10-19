@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Lightbulb, FileText, Loader2 } from "lucide-react";
+import { Lightbulb, Loader2 } from "lucide-react";
 
 const FormSchema = z.object({
     topic: z.string().min(2, {
@@ -34,11 +34,12 @@ export default function Home() {
         },
     });
 
-    // Estado para upload de PDF
+    // Estado para upload de PDF e seleção de tópico
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
     const [topics, setTopics] = useState<string[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
 
     // Função para envio do quiz por texto
     function onSubmit(data: z.infer<typeof FormSchema>) {
@@ -55,6 +56,7 @@ export default function Home() {
         setLoading(true);
         setError(null);
         setTopics([]);
+        setSelectedTopic(null);
 
         try {
             const formData = new FormData();
@@ -81,9 +83,11 @@ export default function Home() {
         }
     }
 
-    // Redireciona para o quiz com o tópico selecionado
-    function handleTopicClick(topic: string) {
-        router.push(`/quiz?topic=${encodeURIComponent(topic)}`);
+    // Redireciona para o quiz com o tópico selecionado do PDF
+    function handleGenerateQuiz() {
+        if (selectedTopic) {
+            router.push(`/quiz?topic=${encodeURIComponent(selectedTopic)}`);
+        }
     }
 
     return (
@@ -164,17 +168,23 @@ export default function Home() {
                                                 setFile(e.target.files?.[0] || null);
                                                 setTopics([]);
                                                 setError(null);
+                                                setSelectedTopic(null);
                                             }}
                                             className="text-center text-lg h-14"
                                         />
                                     </FormControl>
-                                    <Button onClick={handleUpload} disabled={loading} className="text-lg h-14 font-bold sm:w-48">
+                                    <Button
+                                        type="button" // ✅ impede validação do campo topic
+                                        onClick={handleUpload}
+                                        disabled={loading}
+                                        className="text-lg h-14 font-bold sm:w-48"
+                                    >
                                         {loading ? (
                                             <>
                                                 <Loader2 className="animate-spin w-4 h-4 mr-2" /> Processando...
                                             </>
                                         ) : (
-                                            "Upload PDF"
+                                            "Extrair PDF"
                                         )}
                                     </Button>
                                 </div>
@@ -183,20 +193,32 @@ export default function Home() {
 
                             {/* Tópicos extraídos do PDF */}
                             {topics.length > 0 && (
-                                <div className="bg-gray-100 rounded-lg p-4 text-black text-sm">
+                                <div className="bg-gray-100 rounded-lg p-4 text-black text-sm space-y-4">
                                     <h3 className="font-bold text-lg mb-3 text-primary">Tópicos encontrados:</h3>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                         {topics.map((t, i) => (
                                             <Card
                                                 key={i}
-                                                onClick={() => handleTopicClick(t)}
-                                                className="shadow-md hover:shadow-lg transition-shadow border border-gray-200 cursor-pointer hover:bg-accent/10"
+                                                onClick={() => setSelectedTopic(t)}
+                                                className={`shadow-md transition-shadow border border-gray-200 cursor-pointer hover:shadow-lg hover:bg-accent/10
+                          ${selectedTopic === t ? "bg-green-200 border-green-500" : ""}`}
                                             >
                                                 <CardContent className="p-4 text-center">
                                                     <p className="font-medium text-gray-800">{t}</p>
                                                 </CardContent>
                                             </Card>
                                         ))}
+                                    </div>
+
+                                    {/* Botão Gerar Quiz para o tópico selecionado */}
+                                    <div className="flex justify-center mt-4">
+                                        <Button
+                                            onClick={handleGenerateQuiz}
+                                            disabled={!selectedTopic}
+                                            className="text-lg h-14 font-bold sm:w-48"
+                                        >
+                                            Gerar Quiz
+                                        </Button>
                                     </div>
                                 </div>
                             )}
