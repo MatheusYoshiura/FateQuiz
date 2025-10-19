@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ export default function PDFUploadPage() {
     const [loading, setLoading] = useState(false);
     const [topics, setTopics] = useState<string[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const router = useRouter(); // ✅ Adicionado
 
     async function handleUpload() {
         if (!file) {
@@ -41,8 +43,6 @@ export default function PDFUploadPage() {
             console.log("Resposta completa do backend:", data);
             console.log("Array que será definido em state:", data.topics);
 
-            // ✅ Garante que topics seja sempre array
-            // setTopics(Array.isArray(data.topics) ? data.topics : []);
             setTopics(Array.isArray(data.topics?.topics) ? data.topics.topics : []);
         } catch (err: any) {
             console.error("Erro:", err);
@@ -50,6 +50,11 @@ export default function PDFUploadPage() {
         } finally {
             setLoading(false);
         }
+    }
+
+    // ✅ Função para redirecionar para o quiz
+    function handleTopicClick(topic: string) {
+        router.push(`/quiz?topic=${encodeURIComponent(topic)}`);
     }
 
     return (
@@ -96,12 +101,20 @@ export default function PDFUploadPage() {
                     <div className="bg-gray-100 rounded-lg p-4 text-black text-sm">
                         {topics.length > 0 ? (
                             <>
-                                <h3 className="font-bold mb-2">Tópicos encontrados:</h3>
-                                <ul className="list-disc pl-5">
+                                <h3 className="font-bold text-lg mb-3 text-primary">Tópicos encontrados:</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                     {topics.map((t, i) => (
-                                        <li key={i}>{t}</li>
+                                        <Card
+                                            key={i}
+                                            onClick={() => handleTopicClick(t)} // ✅ Clique leva ao quiz
+                                            className="shadow-md hover:shadow-lg transition-shadow border border-gray-200 cursor-pointer hover:bg-accent/10"
+                                        >
+                                            <CardContent className="p-4 text-center">
+                                                <p className="font-medium text-gray-800">{t}</p>
+                                            </CardContent>
+                                        </Card>
                                     ))}
-                                </ul>
+                                </div>
                             </>
                         ) : (
                             <p className="text-gray-500">Nenhum tópico extraído ainda.</p>
