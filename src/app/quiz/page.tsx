@@ -10,9 +10,10 @@ export default async function QuizPage({
 }: {
   searchParams: { topic?: string };
 }) {
-  const topic = searchParams.topic;
+    const params = await searchParams;
+    const topic = params.topic;
 
-  if (!topic) {
+    if (!topic) {
     redirect('/');
   }
 
