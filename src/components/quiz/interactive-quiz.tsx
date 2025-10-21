@@ -160,8 +160,9 @@ export default function InteractiveQuiz({ quizData, topic }: { quizData: QuizDat
 
         </CardContent>
         <CardFooter className="flex flex-col sm:flex-row gap-2">
-          <Button onClick={() => router.push('/')} variant="outline" className="w-full"><Home className="mr-2"/> Início</Button>
           <Button onClick={() => router.push(`/quiz?topic=${encodeURIComponent(topic)}`)} className="w-full"><Repeat className="mr-2"/> Tentar Novamente</Button>
+          <Button onClick={() => router.push(`/pdf`)} className="w-full"><Repeat className="mr-2"/> Escolher Outro Topico</Button>
+          <Button onClick={() => router.push('/')} variant="outline" className="w-full"><Home className="mr-2"/> Início</Button>
         </CardFooter>
       </Card>
     );

@@ -56,7 +56,6 @@ export default function Home() {
         setLoading(true);
         setError(null);
         setTopics([]);
-        setSelectedTopic(null);
 
         try {
             const formData = new FormData();
@@ -74,7 +73,15 @@ export default function Home() {
             }
 
             const data = await res.json();
-            setTopics(Array.isArray(data.topics?.topics) ? data.topics.topics : []);
+            const extractedTopics = Array.isArray(data.topics?.topics)
+                ? data.topics.topics
+                : [];
+
+            // ✅ Salva os tópicos no sessionStorage
+            sessionStorage.setItem("pdfTopics", JSON.stringify(extractedTopics));
+
+            // ✅ Redireciona para /pdf
+            router.push("/pdf");
         } catch (err: any) {
             console.error("Erro:", err);
             setError(err.message || "Falha ao processar o PDF.");
@@ -82,6 +89,7 @@ export default function Home() {
             setLoading(false);
         }
     }
+
 
     // Redireciona para o quiz com o tópico selecionado do PDF
     function handleGenerateQuiz() {
