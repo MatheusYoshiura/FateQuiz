@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 
 export default function PdfPage() {
     const [topics, setTopics] = useState<string[]>([]);
+    const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -19,8 +20,10 @@ export default function PdfPage() {
         }
     }, [router]);
 
-    const handleTopicClick = (topic: string) => {
-        router.push(`/quiz?topic=${encodeURIComponent(topic)}`);
+    const handleGenerateQuiz = () => {
+        if (selectedTopic) {
+            router.push(`/quiz?topic=${encodeURIComponent(selectedTopic)}`);
+        }
     };
 
     return (
@@ -52,12 +55,18 @@ export default function PdfPage() {
                         </p>
                     ) : (
                         <div className="space-y-6">
+                            {/* Lista de tópicos */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                 {topics.map((topic, i) => (
                                     <Card
                                         key={i}
-                                        onClick={() => handleTopicClick(topic)}
-                                        className="shadow-md transition-shadow border border-gray-200 cursor-pointer hover:shadow-lg hover:bg-accent/10"
+                                        onClick={() => setSelectedTopic(topic)}
+                                        className={`shadow-md transition-shadow border cursor-pointer hover:shadow-lg hover:bg-accent/10 
+                      ${
+                                            selectedTopic === topic
+                                                ? "bg-green-200 border-green-500"
+                                                : "border-gray-200"
+                                        }`}
                                     >
                                         <CardContent className="p-4 text-center">
                                             <p className="font-medium text-gray-800">{topic}</p>
@@ -66,13 +75,21 @@ export default function PdfPage() {
                                 ))}
                             </div>
 
-                            <div className="flex justify-center">
+                            {/* Botões de ação */}
+                            <div className="flex flex-col sm:flex-row justify-center gap-4 mt-6">
                                 <Button
                                     variant="secondary"
                                     onClick={() => router.push("/")}
-                                    className="h-12 px-8 text-lg font-semibold"
+                                    className="text-lg h-14 font-bold sm:w-48"
                                 >
                                     Enviar outro PDF
+                                </Button>
+                                <Button
+                                    onClick={handleGenerateQuiz}
+                                    disabled={!selectedTopic}
+                                    className="text-lg h-14 font-bold sm:w-48"
+                                >
+                                    Gerar Quiz
                                 </Button>
                             </div>
                         </div>
