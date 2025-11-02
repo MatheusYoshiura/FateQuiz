@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import { generateQuizFromTopic } from '@/ai/flows/generate-quiz-from-topic';
-import { getQuizFromCache } from './actions';
 import InteractiveQuiz from '@/components/quiz/interactive-quiz';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal, Clock, FileQuestion } from 'lucide-react';
@@ -11,30 +10,18 @@ import Link from 'next/link';
 export default async function QuizPage({
   searchParams,
 }: {
-  searchParams: { topic?: string; quizId?: string };
+  searchParams: { topic?: string };
 }) {
   const topic = searchParams.topic;
-  const quizId = searchParams.quizId;
 
-  if (!topic && !quizId) {
+  if (!topic) {
     redirect('/');
   }
 
   let quizData;
-  let quizTopic = topic || "Tópico do PDF";
 
   try {
-    if (topic) {
-      quizData = await generateQuizFromTopic({ topic: topic, numQuestions: 10 });
-    } else if (quizId) {
-      quizData = await getQuizFromCache(quizId);
-      if (quizData) {
-        // O tópico é extraído pela IA no fluxo do PDF
-        quizTopic = quizData.topic || quizTopic;
-      }
-    } else {
-      redirect('/');
-    }
+    quizData = await generateQuizFromTopic({ topic: topic, numQuestions: 10 });
   } catch (error: any) {
     console.error("Falha ao gerar o quiz:", error);
 
@@ -80,7 +67,7 @@ export default async function QuizPage({
                 <FileQuestion className="h-4 w-4" />
                 <AlertTitle>Nenhuma Pergunta Encontrada</AlertTitle>
                 <AlertDescription>
-                    A IA não conseguiu criar nenhuma pergunta para "{quizTopic}". Isso pode acontecer com tópicos muito específicos, abstratos, ou se o PDF estiver vazio/ilegível. Por favor, tente um diferente.
+                    A IA não conseguiu criar nenhuma pergunta para "{topic}". Isso pode acontecer com tópicos muito específicos ou abstratos. Por favor, tente um diferente.
                 </AlertDescription>
             </Alert>
             <Button asChild variant="link" className="mt-4">
@@ -95,7 +82,7 @@ export default async function QuizPage({
         <div className="absolute pointer-events-none inset-0 flex items-center justify-center bg-background [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
         <div className="absolute top-0 left-0 w-full h-full bg-grid-small-black/[0.2] dark:bg-grid-small-white/[0.2] pointer-events-none"></div>
         <Suspense fallback={<div>Carregando quiz...</div>}>
-            <InteractiveQuiz quizData={quizData} topic={quizTopic} />
+            <InteractiveQuiz quizData={quizData} topic={topic} />
         </Suspense>
     </main>
   );

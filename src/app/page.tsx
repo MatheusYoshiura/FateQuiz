@@ -15,9 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Lightbulb, FileText } from "lucide-react";
-import PdfUploader from "@/components/quiz/pdf-uploader";
+import { Lightbulb } from "lucide-react";
 
 const TopicFormSchema = z.object({
   topic: z.string().min(2, {
@@ -29,14 +27,14 @@ const TopicFormSchema = z.object({
 export default function Home() {
   const router = useRouter();
 
-  const topicForm = useForm<z.infer<typeof TopicFormSchema>>({
+  const form = useForm<z.infer<typeof TopicFormSchema>>({
     resolver: zodResolver(TopicFormSchema),
     defaultValues: {
       topic: "",
     },
   });
 
-  function onTopicSubmit(data: z.infer<typeof TopicFormSchema>) {
+  function onSubmit(data: z.infer<typeof TopicFormSchema>) {
     router.push(`/quiz?topic=${encodeURIComponent(data.topic)}`);
   }
 
@@ -55,51 +53,34 @@ export default function Home() {
             FateQuiz
           </CardTitle>
           <p className="text-muted-foreground">
-            Crie um quiz sobre qualquer tópico ou a partir de um PDF!
+            Crie um quiz sobre qualquer tópico instantaneamente!
           </p>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="topic" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="topic">
-                <Lightbulb className="w-4 h-4 mr-2"/>
-                Gerar por Tópico
-              </TabsTrigger>
-              <TabsTrigger value="pdf">
-                <FileText className="w-4 h-4 mr-2"/>
-                Gerar por PDF
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="topic" className="pt-4">
-              <Form {...topicForm}>
-                <form onSubmit={topicForm.handleSubmit(onTopicSubmit)} className="space-y-6">
-                  <FormField
-                    control={topicForm.control}
-                    name="topic"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="sr-only">Tópico</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="ex: O Império Romano, Hooks do React.js"
-                            {...field}
-                            className="text-center text-lg h-14"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit" className="w-full text-lg h-12 font-bold" size="lg">
-                    Gerar Quiz
-                  </Button>
-                </form>
-              </Form>
-            </TabsContent>
-            <TabsContent value="pdf" className="pt-4">
-              <PdfUploader />
-            </TabsContent>
-          </Tabs>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="topic"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="sr-only">Tópico</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="ex: O Império Romano, Hooks do React.js"
+                        {...field}
+                        className="text-center text-lg h-14"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full text-lg h-12 font-bold" size="lg">
+                Gerar Quiz
+              </Button>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </main>
