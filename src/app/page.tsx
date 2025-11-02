@@ -14,6 +14,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Lightbulb } from "lucide-react";
 
@@ -21,8 +28,8 @@ const TopicFormSchema = z.object({
   topic: z.string().min(2, {
     message: "O tópico deve ter pelo menos 2 caracteres.",
   }),
+  numQuestions: z.string(),
 });
-
 
 export default function Home() {
   const router = useRouter();
@@ -31,11 +38,12 @@ export default function Home() {
     resolver: zodResolver(TopicFormSchema),
     defaultValues: {
       topic: "",
+      numQuestions: "10",
     },
   });
 
   function onSubmit(data: z.infer<typeof TopicFormSchema>) {
-    router.push(`/quiz?topic=${encodeURIComponent(data.topic)}`);
+    router.push(`/quiz?topic=${encodeURIComponent(data.topic)}&numQuestions=${data.numQuestions}`);
   }
 
   return (
@@ -44,7 +52,7 @@ export default function Home() {
         <CardHeader className="text-center">
           <div className="flex justify-center items-center gap-2 mb-2">
             <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
-                <Lightbulb className="w-8 h-8 text-primary-foreground" />
+              <Lightbulb className="w-8 h-8 text-primary-foreground" />
             </div>
           </div>
           <CardTitle className="text-4xl font-headline font-bold">
@@ -62,18 +70,43 @@ export default function Home() {
                 name="topic"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="sr-only">Tópico</FormLabel>
+                    <FormLabel>Tópico</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="ex: O Império Romano, Hooks do React.js"
                         {...field}
-                        className="text-center text-lg h-14"
+                        className="text-lg h-12"
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="numQuestions"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Número de Perguntas</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="text-lg h-12">
+                          <SelectValue placeholder="Selecione o número de perguntas" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="5">5 Perguntas</SelectItem>
+                        <SelectItem value="10">10 Perguntas</SelectItem>
+                        <SelectItem value="15">15 Perguntas</SelectItem>
+                        <SelectItem value="20">20 Perguntas</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <Button type="submit" className="w-full text-lg h-12 font-bold" size="lg">
                 Gerar Quiz
               </Button>
