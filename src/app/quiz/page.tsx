@@ -78,9 +78,7 @@ export default async function QuizPage({
   }
 
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center p-4 md:p-6">
-        <div className="absolute pointer-events-none inset-0 flex items-center justify-center bg-background [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
-        <div className="absolute top-0 left-0 w-full h-full bg-grid-small-black/[0.2] dark:bg-grid-small-white/[0.2] pointer-events-none"></div>
+    <main className="relative flex min-h-screen flex-col items-center justify-center p-4 md:p-6 bg-background">
         <Suspense fallback={<div>Carregando quiz...</div>}>
             <InteractiveQuiz quizData={quizData} topic={topic} />
         </Suspense>

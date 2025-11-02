@@ -29,7 +29,7 @@ type QuizState = "ongoing" | "answered" | "completed";
 type UserAnswer = { question: string; answer: string; isCorrect: boolean; correctAnswer: string; };
 
 function playCorrectSound() {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== 'undefined' && window.AudioContext) {
     try {
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       if (!audioContext) return;
@@ -189,7 +189,7 @@ export default function InteractiveQuiz({ quizData, topic }: { quizData: QuizDat
               } else if (isSelected) {
                   buttonClass = 'bg-red-500 text-white';
               } else {
-                  buttonClass = 'bg-secondary text-muted-foreground opacity-50';
+                  buttonClass = 'bg-secondary text-secondary-foreground border border-transparent';
               }
             }
 
