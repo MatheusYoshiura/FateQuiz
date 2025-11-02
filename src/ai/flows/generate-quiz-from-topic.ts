@@ -12,20 +12,30 @@ import {z} from 'genkit';
 
 const GenerateQuizFromTopicInputSchema = z.object({
   topic: z.string().describe('The topic to generate the quiz about.'),
-  numQuestions: z.number().default(10).describe('The number of questions to generate.'),
+  numQuestions: z
+    .number()
+    .default(10)
+    .describe('The number of questions to generate.'),
+  difficulty: z
+    .string()
+    .optional()
+    .default('Médio')
+    .describe('The difficulty of the quiz (Fácil, Médio, Difícil).'),
 });
 export type GenerateQuizFromTopicInput = z.infer<
   typeof GenerateQuizFromTopicInputSchema
 >;
 
 const GenerateQuizFromTopicOutputSchema = z.object({
-  quiz: z.array(
-    z.object({
-      question: z.string().describe('The quiz question.'),
-      options: z.array(z.string()).describe('The possible answers.'),
-      answer: z.string().describe('The correct answer.'),
-    })
-  ).describe('The generated quiz questions.'),
+  quiz: z
+    .array(
+      z.object({
+        question: z.string().describe('The quiz question.'),
+        options: z.array(z.string()).describe('The possible answers.'),
+        answer: z.string().describe('The correct answer.'),
+      })
+    )
+    .describe('The generated quiz questions.'),
 });
 export type GenerateQuizFromTopicOutput = z.infer<
   typeof GenerateQuizFromTopicOutputSchema
@@ -45,6 +55,7 @@ const prompt = ai.definePrompt({
 
 Tópico: {{{topic}}}
 Número de Questões: {{{numQuestions}}}
+Dificuldade: {{{difficulty}}}
 
 Cada questão deve ter 4 respostas possíveis.
 Garanta que uma das opções seja a resposta correta.

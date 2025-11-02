@@ -10,10 +10,11 @@ import Link from 'next/link';
 export default async function QuizPage({
   searchParams,
 }: {
-  searchParams: { topic?: string, numQuestions?: string };
+  searchParams: { topic?: string, numQuestions?: string, difficulty?: string };
 }) {
   const topic = searchParams.topic;
   const numQuestions = Number(searchParams.numQuestions) || 10;
+  const difficulty = searchParams.difficulty || "Médio";
 
   if (!topic) {
     redirect('/');
@@ -22,7 +23,7 @@ export default async function QuizPage({
   let quizData;
 
   try {
-    quizData = await generateQuizFromTopic({ topic: topic, numQuestions: numQuestions });
+    quizData = await generateQuizFromTopic({ topic: topic, numQuestions: numQuestions, difficulty: difficulty });
   } catch (error: any) {
     console.error("Falha ao gerar o quiz:", error);
 

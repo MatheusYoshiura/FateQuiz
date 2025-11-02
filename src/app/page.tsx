@@ -29,6 +29,7 @@ const TopicFormSchema = z.object({
     message: "O tópico deve ter pelo menos 2 caracteres.",
   }),
   numQuestions: z.string(),
+  difficulty: z.string(),
 });
 
 export default function Home() {
@@ -39,11 +40,12 @@ export default function Home() {
     defaultValues: {
       topic: "",
       numQuestions: "10",
+      difficulty: "Médio",
     },
   });
 
   function onSubmit(data: z.infer<typeof TopicFormSchema>) {
-    router.push(`/quiz?topic=${encodeURIComponent(data.topic)}&numQuestions=${data.numQuestions}`);
+    router.push(`/quiz?topic=${encodeURIComponent(data.topic)}&numQuestions=${data.numQuestions}&difficulty=${data.difficulty}`);
   }
 
   return (
@@ -83,29 +85,54 @@ export default function Home() {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="numQuestions"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Número de Perguntas</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="text-lg h-12">
-                          <SelectValue placeholder="Selecione o número de perguntas" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="5">5 Perguntas</SelectItem>
-                        <SelectItem value="10">10 Perguntas</SelectItem>
-                        <SelectItem value="15">15 Perguntas</SelectItem>
-                        <SelectItem value="20">20 Perguntas</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="numQuestions"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nº de Perguntas</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="text-lg h-12">
+                            <SelectValue placeholder="Número" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="5">5</SelectItem>
+                          <SelectItem value="10">10</SelectItem>
+                          <SelectItem value="15">15</SelectItem>
+                          <SelectItem value="20">20</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="difficulty"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Dificuldade</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="text-lg h-12">
+                            <SelectValue placeholder="Nível" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Fácil">Fácil</SelectItem>
+                          <SelectItem value="Médio">Médio</SelectItem>
+                          <SelectItem value="Difícil">Difícil</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <Button type="submit" className="w-full text-lg h-12 font-bold" size="lg">
                 Gerar Quiz
