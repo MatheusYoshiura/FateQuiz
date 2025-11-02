@@ -49,7 +49,7 @@ export default function Home() {
                 <Lightbulb className="w-8 h-8 text-primary-foreground" />
             </div>
           </div>
-          <CardTitle className="text-4xl font-headline font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary-foreground to-primary">
+          <CardTitle className="text-4xl font-headline font-bold">
             FateQuiz
           </CardTitle>
           <p className="text-muted-foreground">
