@@ -206,7 +206,7 @@ export default function InteractiveQuiz({ quizData, topic }: { quizData: QuizDat
           })}
         </CardContent>
         <CardFooter>
-            <Button variant="ghost" onClick={() => router.push('/')}>
+            <Button variant="link" className="text-destructive" onClick={() => router.push('/')}>
                 Cancelar Quiz
             </Button>
         </CardFooter>
