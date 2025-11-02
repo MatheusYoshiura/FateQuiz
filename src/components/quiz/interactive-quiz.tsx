@@ -124,7 +124,7 @@ export default function InteractiveQuiz({ quizData, topic }: { quizData: QuizDat
     return (
       <Card className="w-full max-w-3xl animate-in fade-in-50 duration-500">
         <CardHeader className="text-center">
-          <Award className="mx-auto h-16 w-16 text-accent" />
+          <Award className="mx-auto h-16 w-16 text-primary" />
           <CardTitle className="text-3xl font-headline">Quiz Concluído!</CardTitle>
           <CardDescription className="text-lg">Tópico: {topic}</CardDescription>
         </CardHeader>
@@ -161,7 +161,7 @@ export default function InteractiveQuiz({ quizData, topic }: { quizData: QuizDat
         </CardContent>
         <CardFooter className="flex flex-col sm:flex-row gap-2">
           <Button onClick={() => router.push('/')} variant="outline" className="w-full"><Home className="mr-2"/> Início</Button>
-          <Button onClick={() => router.push(`/quiz?topic=${encodeURIComponent(topic)}`)} className="w-full"><Repeat className="mr-2"/> Tentar Novamente</Button>
+          <Button onClick={() => window.location.reload()} className="w-full"><Repeat className="mr-2"/> Tentar Novamente</Button>
         </CardFooter>
       </Card>
     );

@@ -46,7 +46,7 @@ const StarParticle = ({ id, color }: { id: number; color: string }) => {
 };
 
 export const StarBurst = React.memo(({ count = 20 }: { count?: number }) => {
-    const colors = ['hsl(var(--primary))', 'hsl(var(--accent))', '#FFD700'];
+    const colors = ['hsl(var(--primary))', '#FFC700', '#FF0000', '#8A2BE2', '#00BFFF'];
     const particles = useMemo(() => 
         Array.from({ length: count }, (_, i) => ({
             id: i,
