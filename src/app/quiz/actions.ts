@@ -1,8 +1,9 @@
 "use server";
 
 import { summarizeQuizResults, type SummarizeQuizResultsInput } from "@/ai/flows/summarize-quiz-results";
-import { generateQuizFromPdfText, type GenerateQuizFromPdfTextInput } from "@/ai/flows/generate-quiz-from-pdf-text";
+import { generateQuizFromPdfText } from "@/ai/flows/generate-quiz-from-pdf-text";
 import { QuizData } from "@/lib/types";
+import pdf from 'pdf-parse';
 
 // Usaremos um cache em memória simples para armazenar os quizzes gerados por PDF.
 // Em uma aplicação de produção, isso seria um banco de dados como Firestore ou Redis.
@@ -26,14 +27,18 @@ export async function generateQuizFromPdf(formData: FormData): Promise<{ quizId?
   }
 
   try {
-    // Para ler o arquivo, precisamos do buffer
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+    
+    const data = await pdf(buffer);
+    const textContent = data.text;
 
-    // Usa a nova função de IA para obter o quiz
-    const quizData = await generateQuizFromPdfText({ pdfContent: buffer });
+    if (!textContent.trim()) {
+      throw new Error("O conteúdo do PDF está vazio ou não pôde ser lido.");
+    }
 
-    // Gera um ID único para este quiz e armazena em cache
+    const quizData = await generateQuizFromPdfText({ textContent });
+
     const quizId = crypto.randomUUID();
     quizCache.set(quizId, quizData);
 

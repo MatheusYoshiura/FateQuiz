@@ -3,37 +3,15 @@
  * @fileOverview AI quiz generator flow from PDF text content.
  *
  * - generateQuizFromPdfText - A function that handles quiz generation from PDF text.
- * - GenerateQuizFromPdfTextInput - The input type for the function.
- * - GenerateQuizFromPdfTextOutput - The return type for the function.
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-import pdf from 'pdf-parse';
+import { GenerateQuizFromPdfTextInput, GenerateQuizFromPdfTextInputSchema, GenerateQuizFromPdfTextOutput, GenerateQuizFromPdfTextOutputSchema } from '@/lib/types';
 
-// Nota: O input real será um Buffer, mas para o schema da IA, tratamos como string.
-export const GenerateQuizFromPdfTextInputSchema = z.object({
-  pdfContent: z.any().describe('The buffer content of the PDF file.'),
-});
-export type GenerateQuizFromPdfTextInput = z.infer<typeof GenerateQuizFromPdfTextInputSchema>;
-
-export const GenerateQuizFromPdfTextOutputSchema = z.object({
-  topic: z.string().describe('The main topic identified from the PDF content.'),
-  quiz: z.array(
-    z.object({
-      question: z.string().describe('The quiz question.'),
-      options: z.array(z.string()).describe('The possible answers.'),
-      answer: z.string().describe('The correct answer.'),
-    })
-  ).describe('The generated quiz questions.'),
-});
-export type GenerateQuizFromPdfTextOutput = z.infer<typeof GenerateQuizFromPdfTextOutputSchema>;
 
 const prompt = ai.definePrompt({
   name: 'generateQuizFromPdfTextPrompt',
-  input: {schema: z.object({
-    textContent: z.string()
-  })},
+  input: {schema: GenerateQuizFromPdfTextInputSchema},
   output: {schema: GenerateQuizFromPdfTextOutputSchema},
   prompt: `Você é um especialista em analisar conteúdo e gerar quizzes. Analise o texto abaixo, extraído de um documento.
 
@@ -52,23 +30,14 @@ Gere um objeto JSON com a propriedade "topic" contendo o tópico principal ident
 `,
 });
 
-export const generateQuizFromPdfTextFlow = ai.defineFlow(
+const generateQuizFromPdfTextFlow = ai.defineFlow(
   {
     name: 'generateQuizFromPdfTextFlow',
     inputSchema: GenerateQuizFromPdfTextInputSchema,
     outputSchema: GenerateQuizFromPdfTextOutputSchema,
   },
   async (input) => {
-    // Extrai o texto do buffer do PDF
-    const data = await pdf(input.pdfContent);
-    const textContent = data.text;
-
-    if (!textContent.trim()) {
-      throw new Error("O conteúdo do PDF está vazio ou não pôde ser lido.");
-    }
-    
-    // Chama a IA com o texto extraído
-    const {output} = await prompt({ textContent });
+    const {output} = await prompt(input);
     return output!;
   }
 );
