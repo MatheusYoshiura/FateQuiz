@@ -3,7 +3,9 @@ import { redirect } from 'next/navigation';
 import { generateQuizFromTopic } from '@/ai/flows/generate-quiz-from-topic';
 import InteractiveQuiz from '@/components/quiz/interactive-quiz';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Terminal } from 'lucide-react';
+import { Terminal, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default async function QuizPage({
   searchParams,
@@ -19,8 +21,28 @@ export default async function QuizPage({
   let quizData;
   try {
     quizData = await generateQuizFromTopic({ topic: topic, numQuestions: 10 });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Falha ao gerar o quiz:", error);
+
+    // Verifica se é um erro de limite de taxa (429)
+    if (error.message && error.message.includes('429')) {
+       return (
+        <div className="flex min-h-screen flex-col items-center justify-center p-4 text-center">
+            <Alert variant="destructive" className="max-w-lg">
+                <Clock className="h-4 w-4" />
+                <AlertTitle>Muitas Requisições</AlertTitle>
+                <AlertDescription>
+                    Você atingiu o limite de requisições. Por favor, aguarde um minuto antes de tentar gerar um novo quiz.
+                </AlertDescription>
+            </Alert>
+            <Button asChild variant="link" className="mt-4">
+              <Link href="/">Voltar para o Início</Link>
+            </Button>
+        </div>
+       )
+    }
+
+    // Erro genérico
     return (
         <div className="flex min-h-screen items-center justify-center p-4">
             <Alert variant="destructive" className="max-w-lg">
