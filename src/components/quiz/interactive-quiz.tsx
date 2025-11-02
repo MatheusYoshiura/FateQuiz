@@ -198,7 +198,7 @@ export default function InteractiveQuiz({
           <CardFooter className="flex flex-col sm:flex-row gap-2">
             <Button
                 onClick={() => {
-                  window.location.href = `/quiz?topic=${encodeURIComponent(topic)}`;
+                  window.location.href = `/quiz?topic=${encodeURIComponent(topic)}&fromPdf=true`;
                 }}
                 className="w-full"
             >
