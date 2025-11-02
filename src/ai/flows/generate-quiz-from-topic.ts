@@ -58,7 +58,7 @@ Número de Questões: {{{numQuestions}}}
 Dificuldade: {{{difficulty}}}
 
 Cada questão deve ter 4 respostas possíveis.
-Garanta que uma das opções seja a resposta correta.
+Garanta que uma das opções seja a resposta correta e que a alternativa da resposta não seja a mesma da questão anterior.
 
 Gere um objeto JSON que seja um array de questões, onde cada questão tem as propriedades "question", "options", e "answer".
 `,

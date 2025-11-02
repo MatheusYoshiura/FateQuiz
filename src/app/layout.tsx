@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'FateQuiz',
+  title: 'FateQuiz IA Generator',
   description: 'Gere e faça quizzes sobre qualquer tópico com o poder da IA.',
 };
 
