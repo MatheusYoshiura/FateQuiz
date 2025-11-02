@@ -42,7 +42,9 @@ export async function generateTopicsFromPDF(
         input: { schema: z.object({ text: z.string() }) },
         output: { schema: z.object({ topics: z.array(z.string()) }) },
         prompt: `
-          Leia o texto a seguir e identifique os principais temas ou assuntos tratados.
+          Você é um especialista em análise de materiais didáticos. Leia o texto a seguir e a partir da analise do conteudo identifique os principais temas ou assuntos tratados.
+          Ignore elementos irrelevantes como numeração de páginas, instruções de exercício, palavras desconexas ou metadados de slides.
+          Resuma os tópicos de forma clara e coerente, mantendo a linguagem técnica.
           Responda apenas com uma lista JSON de temas em português.
 
           Texto:
