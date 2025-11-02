@@ -1,4 +1,4 @@
-# Quiz IA Gênio
+# FateQuiz
 
 Este é um projeto Next.js que utiliza a API Gemini para gerar quizzes sobre qualquer tópico.
 

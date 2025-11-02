@@ -50,7 +50,7 @@ export default function Home() {
             </div>
           </div>
           <CardTitle className="text-4xl font-headline font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary-foreground to-primary">
-            Quiz IA Gênio
+            FateQuiz
           </CardTitle>
           <p className="text-muted-foreground">
             Digite qualquer tópico e nós geraremos um quiz para você!
