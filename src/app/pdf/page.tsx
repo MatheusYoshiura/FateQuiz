@@ -22,7 +22,8 @@ export default function PdfPage() {
 
     const handleGenerateQuiz = () => {
         if (selectedTopic) {
-            router.push(`/quiz?topic=${encodeURIComponent(selectedTopic)}`);
+            sessionStorage.setItem("quizOrigin", "pdf");
+            router.push(`/quiz?topic=${encodeURIComponent(selectedTopic)}&fromPdf=true`);
         }
     };
 

@@ -43,6 +43,7 @@ export default function Home() {
 
     // Função para envio do quiz por texto
     function onSubmit(data: z.infer<typeof FormSchema>) {
+        sessionStorage.removeItem("quizOrigin");
         router.push(`/quiz?topic=${encodeURIComponent(data.topic)}`);
     }
 
@@ -192,7 +193,7 @@ export default function Home() {
                                                 <Loader2 className="animate-spin w-4 h-4 mr-2" /> Processando...
                                             </>
                                         ) : (
-                                            "Extrair PDF"
+                                            "Extrair Tópicos"
                                         )}
                                     </Button>
                                 </div>
