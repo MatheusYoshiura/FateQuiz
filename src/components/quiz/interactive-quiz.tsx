@@ -205,6 +205,11 @@ export default function InteractiveQuiz({ quizData, topic }: { quizData: QuizDat
             );
           })}
         </CardContent>
+        <CardFooter>
+            <Button variant="ghost" onClick={() => router.push('/')}>
+                Cancelar Quiz
+            </Button>
+        </CardFooter>
       </Card>
     </>
   );
