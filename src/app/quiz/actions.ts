@@ -39,7 +39,7 @@ export async function generateQuizFromPdf(formData: FormData): Promise<{ quizId?
 
     const quizData = await generateQuizFromPdfText({ textContent });
 
-    const quizId = crypto.randomUUID();
+    const quizId = Date.now().toString(36) + Math.random().toString(36).substring(2);
     quizCache.set(quizId, quizData);
 
     return { quizId };
@@ -49,7 +49,7 @@ export async function generateQuizFromPdf(formData: FormData): Promise<{ quizId?
     if (error.message && error.message.includes('429')) {
       return { error: "Você atingiu o limite de requisições. Por favor, aguarde um minuto antes de tentar gerar um novo quiz." };
     }
-    return { error: "Falha ao extrair informações do PDF ou gerar o quiz. O arquivo pode estar corrompido ou vazio." };
+    return { error: "Falha ao extrair informações do PDF ou gerar o quiz. O arquivo pode estar corrompido, vazio ou ser muito complexo." };
   }
 }
 
