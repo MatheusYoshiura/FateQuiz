@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Lightbulb } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 const TopicFormSchema = z.object({
   topic: z.string().min(2, {
