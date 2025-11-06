@@ -1,12 +1,11 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
-import { generateQuizFromTopic } from '@/ai/flows/generate-quiz-from-topic';
 import InteractiveQuiz from '@/components/quiz/interactive-quiz';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal, Clock, FileQuestion } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { generateQuizFromPdfText } from '@/ai/flows/generate-quiz-from-pdf-text';
+import { generateQuiz } from './actions';
 
 
 export default async function QuizPage({
@@ -18,7 +17,9 @@ export default async function QuizPage({
   const numQuestions = Number(searchParams.numQuestions) || 10;
   const difficulty = searchParams.difficulty || "Médio";
   const isFromPdf = searchParams.fromPdf === 'true';
+  // O textContent agora vem do sessionStorage no cliente, não mais pela URL.
   const textContent = searchParams.textContent;
+
 
   if (!topic) {
     redirect('/');
@@ -28,13 +29,10 @@ export default async function QuizPage({
 
   try {
      if (isFromPdf && textContent) {
-        // We need to implement the logic to get the full text from sessionStorage or another source
-        // For now, let's assume we can pass it via searchParams for simplicity, though this has limits.
         const decodedText = decodeURIComponent(textContent);
-        quizData = await generateQuizFromPdfText({ textContent: decodedText });
-        // The topic from PDF is inside quizData.topic
+        quizData = await generateQuiz({ type: 'pdf', textContent: decodedText });
      } else {
-        quizData = await generateQuizFromTopic({ topic: topic, numQuestions: numQuestions, difficulty: difficulty });
+        quizData = await generateQuiz({ type: 'topic', topic, numQuestions, difficulty });
      }
   } catch (error: any) {
     console.error("Falha ao gerar o quiz:", error);

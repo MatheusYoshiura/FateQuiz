@@ -5,6 +5,27 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { UploadCloud, File, X, Loader2 } from "lucide-react";
+import * as pdfjsLib from 'pdfjs-dist';
+
+// Define o caminho do worker para o pdf.js
+if (typeof window !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.mjs`;
+}
+
+
+async function getPdfFullText(file: File): Promise<string> {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let fullText = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const pageText = content.items.map((item: any) => item.str).join(' ');
+        fullText += pageText + '\n\n';
+    }
+    return fullText.trim();
+}
+
 
 export default function PdfUploader() {
   const [file, setFile] = useState<File | null>(null);
@@ -77,6 +98,10 @@ export default function PdfUploader() {
     formData.append("file", file);
 
     try {
+      // Primeiro, extraímos o texto completo do PDF no cliente
+      const fullText = await getPdfFullText(file);
+      sessionStorage.setItem("pdfFullText", fullText);
+      
       const response = await fetch('/api/pdf/topics', {
         method: 'POST',
         body: formData,
