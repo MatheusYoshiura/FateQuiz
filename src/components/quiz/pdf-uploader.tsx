@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { UploadCloud, File, X, Loader2 } from "lucide-react";
-import { generateQuizFromPdf } from "@/app/quiz/actions";
 
 export default function PdfUploader() {
   const [file, setFile] = useState<File | null>(null);
@@ -16,6 +15,15 @@ export default function PdfUploader() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile && selectedFile.type === "application/pdf") {
+      if(selectedFile.size > 10 * 1024 * 1024) { // 10 MB limit
+        toast({
+          variant: "destructive",
+          title: "Arquivo Muito Grande",
+          description: "Por favor, selecione um arquivo PDF com menos de 10MB.",
+        });
+        setFile(null);
+        return;
+      }
       setFile(selectedFile);
     } else {
       toast({
@@ -34,6 +42,15 @@ export default function PdfUploader() {
     e.preventDefault();
     const droppedFile = e.dataTransfer.files?.[0];
     if (droppedFile && droppedFile.type === "application/pdf") {
+      if(droppedFile.size > 10 * 1024 * 1024) { // 10 MB limit
+        toast({
+          variant: "destructive",
+          title: "Arquivo Muito Grande",
+          description: "Por favor, selecione um arquivo PDF com menos de 10MB.",
+        });
+        setFile(null);
+        return;
+      }
       setFile(droppedFile);
     } else {
       toast({
@@ -57,15 +74,31 @@ export default function PdfUploader() {
     setIsUploading(true);
 
     const formData = new FormData();
-    formData.append("pdf", file);
+    formData.append("file", file);
 
     try {
-      const { quizId, error } = await generateQuizFromPdf(formData);
-      if (error) {
-        throw new Error(error);
+      const response = await fetch('/api/pdf/topics', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Falha ao processar o PDF.');
       }
-      // Armazenamos o ID do quiz para buscar na próxima página
-      router.push(`/quiz?quizId=${quizId}`);
+      
+      const result = await response.json();
+
+      if (result.topics && result.topics.length > 0) {
+        sessionStorage.setItem("pdfTopics", JSON.stringify(result.topics));
+        router.push(`/pdf`);
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Nenhum Tópico Encontrado",
+          description: "Não foi possível extrair tópicos do PDF. Tente um arquivo diferente.",
+        });
+      }
 
     } catch (error: any) {
       console.error("Erro ao gerar quiz do PDF:", error);
@@ -121,10 +154,10 @@ export default function PdfUploader() {
         {isUploading ? (
           <>
             <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-            Gerando...
+            Analisando PDF...
           </>
         ) : (
-          "Gerar Quiz do PDF"
+          "Extrair Tópicos do PDF"
         )}
       </Button>
     </div>

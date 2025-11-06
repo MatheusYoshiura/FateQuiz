@@ -6,15 +6,19 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal, Clock, FileQuestion } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { generateQuizFromPdfText } from '@/ai/flows/generate-quiz-from-pdf-text';
+
 
 export default async function QuizPage({
   searchParams,
 }: {
-  searchParams: { topic?: string, numQuestions?: string, difficulty?: string };
+  searchParams: { topic?: string; numQuestions?: string; difficulty?: string, fromPdf?: string, textContent?: string };
 }) {
   const topic = searchParams.topic;
   const numQuestions = Number(searchParams.numQuestions) || 10;
   const difficulty = searchParams.difficulty || "Médio";
+  const isFromPdf = searchParams.fromPdf === 'true';
+  const textContent = searchParams.textContent;
 
   if (!topic) {
     redirect('/');
@@ -23,11 +27,18 @@ export default async function QuizPage({
   let quizData;
 
   try {
-    quizData = await generateQuizFromTopic({ topic: topic, numQuestions: numQuestions, difficulty: difficulty });
+     if (isFromPdf && textContent) {
+        // We need to implement the logic to get the full text from sessionStorage or another source
+        // For now, let's assume we can pass it via searchParams for simplicity, though this has limits.
+        const decodedText = decodeURIComponent(textContent);
+        quizData = await generateQuizFromPdfText({ textContent: decodedText });
+        // The topic from PDF is inside quizData.topic
+     } else {
+        quizData = await generateQuizFromTopic({ topic: topic, numQuestions: numQuestions, difficulty: difficulty });
+     }
   } catch (error: any) {
     console.error("Falha ao gerar o quiz:", error);
 
-    // Verifica se é um erro de limite de taxa (429)
     if (error.message && error.message.includes('429')) {
        return (
         <div className="flex min-h-screen flex-col items-center justify-center p-4 text-center">
@@ -45,7 +56,6 @@ export default async function QuizPage({
        )
     }
 
-    // Erro genérico
     return (
         <div className="flex min-h-screen flex-col items-center justify-center p-4">
             <Alert variant="destructive" className="max-w-lg">
@@ -69,7 +79,7 @@ export default async function QuizPage({
                 <FileQuestion className="h-4 w-4" />
                 <AlertTitle>Nenhuma Pergunta Encontrada</AlertTitle>
                 <AlertDescription>
-                    A IA não conseguiu criar nenhuma pergunta para "{topic}". Isso pode acontecer com tópicos muito específicos ou abstratos. Por favor, tente um diferente.
+                    A IA não conseguiu criar nenhuma pergunta para "{isFromPdf ? `o tópico do seu PDF` : topic}". Isso pode acontecer com tópicos muito específicos ou abstratos. Por favor, tente um diferente.
                 </AlertDescription>
             </Alert>
             <Button asChild variant="link" className="mt-4">
@@ -79,10 +89,12 @@ export default async function QuizPage({
     );
   }
 
+  const finalTopic = isFromPdf ? quizData.topic || topic : topic;
+
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center p-4 md:p-6 bg-background">
         <Suspense fallback={<div>Carregando quiz...</div>}>
-            <InteractiveQuiz quizData={quizData} topic={topic} />
+            <InteractiveQuiz quizData={quizData} topic={finalTopic} isFromPdf={isFromPdf} />
         </Suspense>
     </main>
   );

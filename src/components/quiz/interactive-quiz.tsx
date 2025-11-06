@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { CheckCircle2, XCircle, Award, BookOpen, Repeat, Home } from "lucide-react";
+import { CheckCircle2, XCircle, Award, BookOpen, Repeat, Home, FileText } from "lucide-react";
 import { StarBurst } from "./confetti";
 
 type QuizState = "ongoing" | "answered" | "completed";
@@ -197,18 +197,18 @@ export default function InteractiveQuiz({
           </CardContent>
 
           <CardFooter className="flex flex-col sm:flex-row gap-2">
-            <Button
-                onClick={() => {
-                  window.location.reload();
-                }}
-                className="w-full"
-            >
-              <Repeat className="mr-2" /> Tentar Novamente
-            </Button>
-
-            {isFromPdf && (
+             {isFromPdf ? (
                 <Button onClick={() => router.push(`/pdf`)} className="w-full">
-                  <Repeat className="mr-2" /> Escolher Outro Tópico
+                  <FileText className="mr-2" /> Outro Tópico do PDF
+                </Button>
+            ) : (
+                 <Button
+                    onClick={() => {
+                      window.location.reload();
+                    }}
+                    className="w-full"
+                >
+                  <Repeat className="mr-2" /> Tentar Novamente
                 </Button>
             )}
 
